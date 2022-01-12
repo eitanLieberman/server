@@ -1,22 +1,27 @@
 const express = require("express");
 
 const socketIo = require("socket.io");
-const http = require("http");
+const dotenv = require("dotenv");
 const cors = require("cors");
+const { chats } = require("./data/data");
 const PORT = process.env.PORT || 8080;
 const router = require("./router");
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+dotenv.config();
+app.get("/", (req, res) => {
+  res.send("api running!");
+});
 
-io.on("connection", (socket) => {
-  console.log("socket connect");
-  socket.on("disconnect", () => {
-    console.log("user had left socket.io");
-  });
+app.get("/api/chats", (req, res) => {
+  res.send(chats);
+});
+
+app.get("/api/chats/:id", (req, res) => {
+  const singleChat = chats.find((c) => c._id === req.params.id);
+  res.send(singleChat);
 });
 
 app.use(router);
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log("server running " + PORT);
 });
