@@ -1,5 +1,4 @@
 const express = require("express");
-
 const socketIo = require("socket.io");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -20,6 +19,7 @@ mongoose
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
+
 app.get("/", (req, res) => {
   res.send("api running!");
 });
