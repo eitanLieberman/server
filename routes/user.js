@@ -39,14 +39,33 @@ router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 //GET SINGLE USER
-router.get("/find/:id", verifyTokenAndAdmin, async (req, res) => {
+router.get("/find/:id", verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    const { password, ...others } = user._doc;
+    // let user = await User.find({
+    //   email: req.params.id,
+    // });
+    // if (!user) {
+    // }
+    let user = await User.find({
+      $or: [
+        { email: { $regex: req.params.id, $options: "i" } },
+        { username: { $regex: req.params.id, $options: "i" } },
+      ],
+    });
+    // console.log(user);
+    const cleanUser = user.map((u) => {
+      const { password, ...others } = u._doc;
+      u._doc = { ...others };
+      console.log(u._doc);
+      return others;
+    });
+    console.log(cleanUser);
+    // const { password, ...others } = user._doc;
 
-    res.status(200).json(others);
+    res.status(200).json(cleanUser);
   } catch (err) {
     res.status(500).json(err);
+    console.log(err);
   }
 });
 

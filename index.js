@@ -10,6 +10,7 @@ const mongoose = require("mongoose");
 dotenv.config();
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
+const chatRoute = require("./routes/chat");
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("DB great success"))
@@ -19,18 +20,9 @@ mongoose
 app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
-
+app.use("/api/chats", chatRoute);
 app.get("/", (req, res) => {
   res.send("api running!");
-});
-
-app.get("/api/chats", (req, res) => {
-  res.send(chats);
-});
-
-app.get("/api/chats/:id", (req, res) => {
-  const singleChat = chats.find((c) => c._id === req.params.id);
-  res.send(singleChat);
 });
 
 app.use(router);
