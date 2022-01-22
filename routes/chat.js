@@ -69,8 +69,6 @@ router.get("/", verifyToken, async (req, res) => {
   }
 });
 
-module.exports = router;
-
 //create a group chat
 router.post("/group", verifyToken, async (req, res) => {
   if (!req.body.users || !req.body.name) {
@@ -182,3 +180,4 @@ router.put("/invite", verifyToken, async (req, res) => {
 
   res.status(201).json(removed);
 });
+module.exports = router;

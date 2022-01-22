@@ -11,6 +11,7 @@ dotenv.config();
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 const chatRoute = require("./routes/chat");
+const messageRoute = require("./routes/message");
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log("DB great success"))
@@ -21,6 +22,7 @@ app.use(express.json());
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
 app.use("/api/chats", chatRoute);
+app.use("/api/messages", messageRoute);
 app.get("/", (req, res) => {
   res.send("api running!");
 });
