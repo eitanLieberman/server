@@ -56,10 +56,10 @@ router.get("/find/:id", verifyToken, async (req, res) => {
     const cleanUser = user.map((u) => {
       const { password, ...others } = u._doc;
       u._doc = { ...others };
-      console.log(u._doc);
+
       return others;
     });
-    console.log(cleanUser);
+
     // const { password, ...others } = user._doc;
 
     res.status(200).json(cleanUser);

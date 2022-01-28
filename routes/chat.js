@@ -11,6 +11,7 @@ const router = require("express").Router();
 //start/access a chat
 router.post("/", verifyToken, async (req, res) => {
   const { userId } = req.body;
+  console.log(userId);
   if (!userId) {
     return res.status(400);
   }
@@ -30,6 +31,7 @@ router.post("/", verifyToken, async (req, res) => {
   });
   if (isChat.length > 0) {
     res.send(isChat[0]);
+    return;
   } else {
     var chatData = {
       chatName: "sender",
@@ -42,6 +44,7 @@ router.post("/", verifyToken, async (req, res) => {
         "users",
         "-password"
       );
+      console.log("done");
       res.status(200).send(FullChat);
     } catch (err) {
       res.json(err);
@@ -52,8 +55,9 @@ router.post("/", verifyToken, async (req, res) => {
 //display all user chats
 router.get("/", verifyToken, async (req, res) => {
   try {
+    console.log(req.user);
     const findChat = await Chat.find({
-      users: { $elemMatch: { $eq: req.user.id } },
+      users: { $elemMatch: { $eq: req.user?.id || req.user._id } },
     })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
@@ -63,6 +67,7 @@ router.get("/", verifyToken, async (req, res) => {
       path: "latestMessage.sender",
       select: "username pic email",
     });
+    // console.log(result);
     res.status(200).send(result);
   } catch (err) {
     console.log(err);
@@ -128,7 +133,7 @@ router.put("/rename", verifyToken, async (req, res) => {
 
 router.put("/remove", verifyToken, async (req, res) => {
   const { chatId, userId } = req.body;
-  console.log(req.user.id);
+
   const targetChat = await Chat.findById(chatId);
 
   if (req.user.id !== targetChat.groupAdmin.toString()) {
@@ -153,7 +158,7 @@ router.put("/remove", verifyToken, async (req, res) => {
 
 router.put("/invite", verifyToken, async (req, res) => {
   const { chatId, userId } = req.body;
-  console.log(req.user.id);
+
   const targetChat = await Chat.findById(chatId);
   //can't add a user who is already in group
   targetChat.users.forEach((user) => {
@@ -180,4 +185,28 @@ router.put("/invite", verifyToken, async (req, res) => {
 
   res.status(201).json(removed);
 });
+
+//LEAVE CHAT
+router.put("/leave", verifyToken, async (req, res) => {
+  const { chatId } = req.body;
+
+  const targetChat = await Chat.findById(chatId);
+
+  console.log(targetChat.users);
+  const removed = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $pull: { users: req.user.id },
+      groupAdmin: targetChat.users[0],
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  res.status(201).json(removed);
+});
+
 module.exports = router;

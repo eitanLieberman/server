@@ -7,7 +7,7 @@ const {
   verifyTokenAndAuthorize,
   verifyTokenAndAdmin,
 } = require("./verifyToken");
-
+//get all messages
 router.get("/:chatId", verifyToken, async (req, res) => {
   try {
     const messages = await Message.find({ chat: req.params.chatId })
@@ -19,7 +19,7 @@ router.get("/:chatId", verifyToken, async (req, res) => {
     throw new Error(error.message);
   }
 });
-
+//send a message
 router.post("/", verifyToken, async (req, res) => {
   const { content, chatId } = req.body;
 
