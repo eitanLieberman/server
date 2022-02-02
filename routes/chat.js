@@ -57,7 +57,7 @@ router.get("/", verifyToken, async (req, res) => {
   try {
     console.log(req.user);
     const findChat = await Chat.find({
-      users: { $elemMatch: { $eq: req.user?.id || req.user._id } },
+      users: { $elemMatch: { $eq: req.user?.id || req.user?._id } },
     })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
@@ -68,7 +68,7 @@ router.get("/", verifyToken, async (req, res) => {
       select: "username pic email",
     });
     // console.log(result);
-    res.status(200).send(result);
+    return res.status(200).send(result);
   } catch (err) {
     console.log(err);
   }

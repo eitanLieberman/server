@@ -25,11 +25,11 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     let user = await User.findOne({
-      email: req.body.username,
+      email: req.body.username.trim(),
     });
     if (!user) {
       user = await User.findOne({
-        username: req.body.username,
+        username: req.body.username.trim(),
       });
     }
 
@@ -50,7 +50,7 @@ router.post("/login", async (req, res) => {
     });
     const { password, ...others } = user._doc;
 
-    res.status(200).json({ ...others, accessToken });
+    return res.status(200).json({ ...others, accessToken });
   } catch (err) {
     res.status(500).json(err);
     console.log(err);
