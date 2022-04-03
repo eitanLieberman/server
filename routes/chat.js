@@ -27,7 +27,7 @@ router.post("/", verifyToken, async (req, res) => {
     .populate("latestMessage");
   isChat = await User.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "username pic email",
   });
   if (isChat.length > 0) {
     res.send(isChat[0]);
@@ -110,6 +110,9 @@ router.post("/group", verifyToken, async (req, res) => {
 
 router.put("/rename", verifyToken, async (req, res) => {
   try {
+    if (req.body.oldName === "main") {
+      throw new Error("main chat can't be renamed");
+    }
     const updatedChat = await Chat.findByIdAndUpdate(
       req.body.chatId,
 
@@ -138,7 +141,7 @@ router.put("/remove", verifyToken, async (req, res) => {
 
   if (req.user.id !== targetChat.groupAdmin.toString()) {
     res.status(404);
-    throw new Error("not group admin");
+    throw new "main chat can't be renamed"("not group admin");
   }
 
   const removed = await Chat.findByIdAndUpdate(
@@ -167,11 +170,14 @@ router.put("/invite", verifyToken, async (req, res) => {
     }
   });
 
-  if (req.user.id !== targetChat.groupAdmin.toString()) {
-    res.status(404).json("not group admin");
+  if (
+    req.user.id !== targetChat.groupAdmin.toString() &&
+    targetChat.chatName !== "main"
+  ) {
+    res.status(401).json("not group admin");
   }
 
-  const removed = await Chat.findByIdAndUpdate(
+  const added = await Chat.findByIdAndUpdate(
     chatId,
     {
       $push: { users: userId },
@@ -183,7 +189,7 @@ router.put("/invite", verifyToken, async (req, res) => {
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 
-  res.status(201).json(removed);
+  res.status(201).json(added);
 });
 
 //LEAVE CHAT
