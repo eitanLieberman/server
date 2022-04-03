@@ -1,5 +1,5 @@
-const express = require("express");
 const socketIo = require("socket.io");
+const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const { chats } = require("./data/data");
